@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="camera_mount">
+
+<xacro:property name="camera_mount_height" value="0.12" />
+<xacro:property name="camera_mount_spacing" value="0.12" />
+
+<xacro:macro name="camera_mount_upright" params="prefix spacing reflect">
+    <link name="camera_mount_${prefix}">
+        <visual>
+            <geometry>
+                <box size="0.04 0.02 ${camera_mount_height}"/>
+            </geometry>
+            <origin xyz="0 0 0.06" rpy="0 0 0"/>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.04 0.02 ${camera_mount_height}"/>
+            </geometry>
+            <origin xyz="0 0 0.06" rpy="0 0 0"/>
+        </collision>
+    </link>
+
+    <joint name="sensor_arch_to_camera_mount_${prefix}" type="fixed">
+        <parent link="sensor_arch_mount_link"/>
+        <child link="camera_mount_${prefix}"/>
+        <origin xyz="0 ${reflect*(spacing/2)} 0" />
+    </joint>
+</xacro:macro>
+
+<xacro:macro name="camera_mount_plate" params="">
+    <link name="camera_mount_plate">
+        <visual>
+            <geometry>
+                <box size="0.04 0.14 0.01"/>
+            </geometry>
+            <origin xyz="0 0 -0.005" rpy="0 0 0"/>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.04 0.14 0.01"/>
+            </geometry>
+            <origin xyz="0 0 -0.005" rpy="0 0 0"/>
+        </collision>
+    </link>
+
+    <joint name="sensor_arch_to_camera_mount_plate" type="fixed">
+        <parent link="sensor_arch_mount_link"/>
+        <child link="camera_mount_plate"/>
+        <origin xyz="0 0 0.12" />
+    </joint>
+</xacro:macro>
+
+<xacro:camera_mount_upright prefix="right" spacing="${camera_mount_spacing}" reflect="1" />
+<xacro:camera_mount_upright prefix="left" spacing="${camera_mount_spacing}" reflect="-1" />
+<xacro:camera_mount_plate/>
+
+<xacro:include filename="$(find dynamixel_pan_tilt)/urdf/dynamixel_pan_tilt.urdf.xacro"/>
+
+
+</robot>
+
+
