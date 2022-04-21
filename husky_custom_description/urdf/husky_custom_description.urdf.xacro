@@ -59,9 +59,9 @@
 <xacro:include filename="$(find dynamixel_pan_tilt)/urdf/dynamixel_pan_tilt.urdf.xacro"/>
 
 <xacro:include filename="$(find zed_wrapper)/urdf/zed_descr.urdf.xacro">
-  <xacro:arg camera_name:="zed2"
-  <xacro:arg camera_model:="zed2"
-  <xacro:arg base_frame:="link3"
+  <xacro:arg name="camera_name" value="zed2"/>
+  <xacro:arg name="camera_model" value="zed2"/>
+  <xacro:arg name="base_frame" value="link3"/>
 </xacro:include>
 
 </robot>
