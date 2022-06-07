@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+Launch driver components of husky's supported accessories.
+
+Environment Variables generally derived from /etc/ros/setup.bash
+
+Second version - original in husky_accessories package:
+https://github.com/Gregory-Baker/husky/tree/main/husky_accessories
+
+-->
+
+<launch>
+
+  <arg name="camera"/>
+  <arg name="kinova_joy_restricted" value="true"/>
+  <arg name="unity" default="true" doc="spawn ros_tcp_endpoint for Unity link"/>
+
+  <group if="$(optenv RPLIDAR 0)">
+    <include file="$(find rplidar_ros)/launch/rplidar.launch" />
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
+      <rosparam command="load" file="$(find husky_accessories)/config/husky_laser_filter.yaml" />
+    </node>
+  </group>
+  
+  <group if="$(optenv RADEYE 0)">
+    <include file="$(find radeye)/launch/radeye_example.launch"/>
+  </group>
+
+  <group if="$(eval arg('camera') == 'zed')">
+    <group if="$(optenv PAN_TILT 0)">
+      <include file="$(find dynamixel_workbench_controllers)/launch/dynamixel_controllers.launch">
+        <arg name="usb_port" value="/dev/dynamixel"/>
+        <arg name="dxl_baud_rate" value="1000000"/>
+      </include>
+    </group>
+
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_zedstream">
+      <param name="cmd" value="/home/jetson/ZED_Streaming_Sender_Depth"/>
+    </node>
+  </group>
+
+  <group if="$(eval arg('camera') == 'zed_novr')">
+    <group if="$(optenv PAN_TILT 0)">
+      <include file="$(find dynamixel_workbench_controllers)/launch/dynamixel_controllers.launch">
+        <arg name="usb_port" value="/dev/dynamixel"/>
+        <arg name="dxl_baud_rate" value="1000000"/>
+      </include>
+    </group>
+    
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_zedstream">
+      <param name="cmd" value="/home/jetson/ZED_Streaming_Sender_Depth"/>
+    </node>
+  </group>
+
+  <group if="$(eval arg('camera') == 'theta')">
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_theta">
+      <param name="cmd" 
+            value="gst-launch-1.0 thetauvcsrc mode=4K ! queue ! h264parse ! rtph264pay mtu=1400 ! udpsink host=192.168.1.114 port=7000 sync=false"/>
+    </node>
+  </group>
+
+  <group if="$(optenv HUSKY_KINOVA 0)">
+    <include file="$(find husky_kinova_bringup)/launch/husky_gen3_bringup.launch">
+      <arg name="gripper" value="robotiq_2f_85"/>
+      <arg name="start_moveit" value="false"/>
+    </include>
+
+    <include file="$(find kinova_joy_teleop)/launch/kinova_joy_teleop.launch">
+      <arg name="restricted_mode" value="$(arg kinova_joy_restricted)"/>
+    </include>
+  </group>
+
+  <group if="$(arg unity)">
+    <include file="$(find ros_tcp_endpoint)/launch/endpoint.launch">  
+      <arg name="tcp_ip" value="192.168.1.117"/>
+    </include>
+  </group>
+
+
+</launch>

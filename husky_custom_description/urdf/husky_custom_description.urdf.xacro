@@ -22,7 +22,7 @@
 </xacro:if>
 
 <xacro:if value="$(optenv RPLIDAR 0)">
-    <xacro:include filename="$(find husky_description)/urdf/accessories/rplidar.urdf.xacro" />
+    <xacro:include filename="$(find husky_custom_description)/urdf/accessories/rplidar.urdf.xacro" />
     <xacro:rplidar parent_link="top_plate_front_link" xyz="$(optenv RPLIDAR_LASER_XYZ 0 0 0)" rpy="$(optenv RPLIDAR_LASER_RPY 0 0 0)"/>
 </xacro:if>
 
